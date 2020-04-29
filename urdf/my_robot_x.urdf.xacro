@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<robot name="my_robot" xmlns:xacro="http://ros.org/wiki/xacro" >  
+
+    <!--include cylinder wheel macro-->
+    <xacro:include filename="$(find my_robot_urdf)/urdf/cylinder_wheel.urdf.xacro" />
+
+    <!--include cylinder wheel macro-->
+    <!-- <xacro:include filename="$(find my_robot_urdf)/urdf/dd_controller_gazebo.xacro" /> -->
+
+    <!-- include Hokuyo Laser scanner -->
+    <xacro:include filename="$(find my_robot_urdf)/urdf/visual_sensor.xacro" />
+
+
+    <!-- PROPERTY LIST -->
+    <!--All units in m-kg-s-radians unit system -->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+    <xacro:property name="M_PI_2" value="1.570796327" />
+    <xacro:property name="DEG_TO_RAD" value="0.017453293" />
+    <!-- Main Body Cylinder base   -->
+    <xacro:property name="base_height" value="0.02" /> 
+    <xacro:property name="base_radius" value="0.15" /> 
+    <xacro:property name="base_mass" value="5" /> <!-- in kg-->
+    <!-- caster wheel -->
+    <xacro:property name="caster_height" value="0.04" /> 
+    <xacro:property name="caster_radius" value="0.025" /> 
+    <xacro:property name="caster_mass" value="0.5" /> <!-- in kg-->
+
+
+    <!-- MACRO LIST -->
+    <!--define caster wheel macro for tag inertial-->
+    <xacro:macro name="caster_inertial" params="mass">
+        <inertial>
+            <mass value="${mass}" />
+            <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                 iyy="0.001" iyz="0.0" 
+                 izz="0.001" />
+      </inertial>
+    </xacro:macro>
+
+
+
+    <!-- LINK LIST -->
+    <!--Body/Chassis of the robot-->
+    <link name="base_link">
+        <inertial>
+            <mass value="${base_mass}" />
+            <!--The 3x3 rotational inertia matrix. -->
+            <cylinder_inertia  m="${base_mass}" r="${base_radius}" h="${base_height}" />
+        </inertial>    
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <cylinder length="${base_height}" radius="${base_radius}" />
+            </geometry>
+        </visual>  
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0 " />
+            <geometry>
+                <cylinder length="${base_height}" radius="${base_radius}" />
+            </geometry>
+        </collision>     
+    </link>
+    <!--Cylinder Wheels -->
+    <cylinder_wheel fb="front" lr="right" parent="base_link" translateX="0" translateY="0.5" flipY="1"/>
+    <cylinder_wheel fb="front" lr="left" parent="base_link" translateX="0" translateY="-0.5" flipY="1"/>
+    <!--Caster Wheels -->
+    <link name="caster_front_link">
+        <visual>
+            <origin xyz="0 0.02 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <sphere radius="${caster_radius}" />
+            </geometry>
+        </visual>  
+        <collision>
+            <geometry>
+                <sphere radius="${caster_radius}" />
+            </geometry>
+            <origin xyz="0 0.02 0" rpy="${M_PI/2} 0 0" />
+        </collision>      
+        <xacro:caster_inertial mass="0.5"/>
+    </link>
+    <joint name="caster_front_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="caster_front_link"/>
+        <origin xyz="0.115 0.0 0.007" rpy="${-M_PI/2} 0 0"/>
+    </joint>
+
+    <link name="caster_back_link">
+        <visual>
+            <origin xyz="0 0.02 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <sphere radius="${caster_radius}" />
+            </geometry>
+        </visual>  
+        <collision>
+            <geometry>
+                <sphere radius="${caster_radius}" />
+            </geometry>
+            <origin xyz="0 0.02 0" rpy="${M_PI/2} 0 0" />
+        </collision>      
+        <xacro:caster_inertial mass="0.5"/>
+    </link>
+    <joint name="caster_back_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="caster_back_link"/>
+      <origin xyz="-0.135 0.0 0.009" rpy="${-M_PI/2} 0 0"/>
+    </joint>
+
+    <!-- SENSORS -->
+    <!-- hokuyo -->
+    <hokuyo base_radius="${base_radius}" base_height="${base_height}"/>
+
+
+    <!-- Gazebo plugin for ROS Control -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/</robotNamespace>
+        </plugin>
+    </gazebo>
+
+
+    <gazebo>
+        <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>50.0</updateRate>
+        <bodyName>base_link</bodyName>
+        <topicName>ground_truth/state</topicName>
+        <gaussianNoise>0.01</gaussianNoise>
+        <frameName>base_link</frameName>
+        <xyzOffsets>0 0 0</xyzOffsets>
+        <rpyOffsets>0 0 0</rpyOffsets>
+        </plugin>
+    </gazebo>
+
+    <!--
+    <dd_controller base_radius="${base_radius}" wheel_radius="${wheel_radius}"/>
+    -->
+
+</robot>
