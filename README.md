@@ -8,8 +8,9 @@ If you want to spawn robot and all controller in gazebo model:
     ```
 If you want to command robot by keyboard arrows:
     ```
-    $ sudo apt-get install ros-melodic-teleop-twist-keyboard
-    $ rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=DD_controller/cmd_vel 
+    #$ sudo apt-get install ros-melodic-teleop-twist-keyboard
+    
+    #$ rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=DD_controller/cmd_vel 
     ```
 
 For the trajectory tracking:
