@@ -40,6 +40,13 @@
 
 
     <!-- LINK LIST -->
+    <link name="map">
+    </link>
+    <joint name="map_joint" type="fixed">
+        <parent link="map"/>
+        <child link="base_link"/>
+    </joint>
+
     <!--Body/Chassis of the robot-->
     <link name="base_link">
         <inertial>
@@ -126,11 +133,12 @@
         <bodyName>base_link</bodyName>
         <topicName>ground_truth/state</topicName>
         <gaussianNoise>0.01</gaussianNoise>
-        <frameName>base_link</frameName>
+        <frameName>map</frameName>
         <xyzOffsets>0 0 0</xyzOffsets>
         <rpyOffsets>0 0 0</rpyOffsets>
         </plugin>
     </gazebo>
+
 
     <!--
     <dd_controller base_radius="${base_radius}" wheel_radius="${wheel_radius}"/>

@@ -22,20 +22,23 @@ class Trajectory_control():
     w_d = []
     theta_d = []
     q=[]
+    q_i=[]
+    q_f=[]
+
     
 
     #methods
     def __init__(self):
         rospy.loginfo("Starting node Trajectory control")
         rospy.init_node('trajectory_control', anonymous=True) #make node
-        self.twist_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10) 
+        self.twist_pub = rospy.Publisher('/DD_controller/cmd_vel', Twist, queue_size=10) 
 
-        rospy.Subscriber('/ground_truth/state',Odometry, self.odometryCb)
+        #rospy.Subscriber('/ground_truth/state',Odometry, self.odometryCb)
         #rospy.Subscriber('move_base_simple/goal', PoseStamped, self.on_goal)
 
 
     #current robot pose
-    def odometryCb(msg):
+    def odometryCb(self,msg):
         x = msg.pose.pose.position[0]
         y = msg.pose.pose.position[1]
         theta = get_angle_pose(msg.pose.pose)
@@ -56,13 +59,13 @@ class Trajectory_control():
 
     #Trajectory generation
     def trajectory_generation(self):
-        q_i = np.array([0,0, -np.pi/3]) #Initial posture (x_i,y_i,theta_i)
-        q_f = np.array([4,3, np.pi])    #Final posture   (x_f,y_f,theta_f)
+        self.q_i = np.array([0,0, -np.pi/3]) #Initial posture (x_i,y_i,theta_i)
+        self.q_f = np.array([4,3, np.pi])    #Final posture   (x_f,y_f,theta_f)
         k = 10
 
         self.t=np.linspace(0,15,1000)
-
-        out = compute_pose_inputs(q_i, q_f, k, self.t)  #return dictionary of waypoint and desire linear/angular vel
+        
+        out = compute_pose_inputs(self.q_i, self.q_f, k, self.t)  #return dictionary of waypoint and desire linear/angular vel
         self.x_d = out['x']
         self.y_d = out['y']
         self.v_d = out['v']
@@ -70,8 +73,11 @@ class Trajectory_control():
         self.theta_d = out['theta']
 
     # #Run the simulation
-    # def simulation_error(self):
-    #     self.err = odeint(unicycle_error_model, self.q, self.t,args=(self.v_d, self.w_d, self.t))
+    def simulation_error(self): #compute error model and integrate
+        q_err = [1,1,0]
+        err = odeint(unicycle_error_model, self.q_i + q_err, self.t, args=(self.v_d, self.w_d, self.t))
+        rospy.loginfo(err)
+        return err
 
     #postprocessing 
     def unicicle_publish_control_var(self):
@@ -79,33 +85,25 @@ class Trajectory_control():
         x = []
         y = []
         theta = []
-        q_err = [1,1,0]
+
+        #run simulation
+        err = self.simulation_error()
+
+        #comput control inputs variable from error
         for i in np.arange(0, len(self.t)):
-            #compute error model and integrate
-            err = odeint(unicycle_error_model, self.q + q_err, self.t,args=(self.v_d, self.w_d, self.t))
-            rospy.loginfo(err)
-            #comput control inputs variable from error
-            u_t = control(err, self.v_d[i], self.w_d[i]) #u1,u2
-            v = self.v_d[i]*np.cos(err[2])-u_t[0]
+            rospy.loginfo(i)            
+            u_t = control(err[i,:], self.v_d[i], self.w_d[i])
+            v = self.v_d[i]*np.cos(err[i,2])-u_t[0]
             w = self.w_d[i]-u_t[1]
-            theta_t = self.theta_d[i] - err[2]
+            theta_t = self.theta_d[i] - err[i,2]
+
             #move robot
             self.send_velocities(v, w, theta_t)
-
             rospy.sleep(15/1000)
         
         #stop after time
-        rate = rospy.Rate(10)
-        while not rospy.is_shutdown():
-            self.send_velocities(0,0)
-            rate.sleep()
+        self.send_velocities(0,0,0)
 
-
-        # self.u.append([v, w])
-        # self.theta_t = theta_d[i] - err[i,2]
-        # self.x.append(x_d[i] - np.cos(theta_t)*err[i,0] + np.sin(theta_t)*err[i,1])
-        # self.y.append(y_d[i] - np.sin(theta_t)*err[i,0] - np.cos(theta_t)*err[i,1])
-        # self.theta.append(theta_t)
 
     #publish v, w
     def send_velocities(self, v, w, theta):
