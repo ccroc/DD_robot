@@ -40,13 +40,6 @@ class Trajectory_generation():
         #Compute the angular velocity
         w = (ypp*xp - xpp*yp)/(v**2)
         
-        # out = {}
-        # out['x'] = x
-        # out['y'] = y
-        # out['theta'] = theta
-        # out['v'] = v*tau
-        # out['w'] = w*tau
-        # return out
         return [x, y, v, w, theta]
 
     def cyrcular_trajectory(self, t):
@@ -57,10 +50,10 @@ class Trajectory_generation():
         y_d = R * np.sin(w_d_val * t)
         dotx_d = -R*w_d_val*np.sin(w_d_val* t)
         doty_d =  R*w_d_val*np.cos(w_d_val* t)
-        self.v_d = np.sqrt(dotx_d**2 + doty_d**2)
-        self.theta_d = np.arctan2(doty_d, dotx_d)
-        self.w_d = w_d_val * np.ones(len(t))
-        return [x_d, y_d, v_d, w_d, theta_d]
+        v_d = np.sqrt(dotx_d**2 + doty_d**2)
+        theta_d = np.arctan2(doty_d, dotx_d)
+        w_d = w_d_val * np.ones(len(t))
+        return [x_d, y_d, v_d, w_d, theta_d, dotx_d, doty_d]
 
     def eight_trajectory(self, t):
         x_c = 0

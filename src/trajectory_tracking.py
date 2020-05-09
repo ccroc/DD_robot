@@ -58,20 +58,21 @@ class Trajectory_control():
         return theta
 
     #Trajectory generation
-    def trajectory_generation(self):
+    def trajectory_generation(self, trajectory):
         tg = Trajectory_generation()
+        if(trajectory == "cubic"):
+            #Cubic_trajectory
+            q_i = np.array([0.,0., 3.14/2]) #Initial posture (x_i,y_i,theta_i)
+            q_f = np.array([3.,6., 0.])    #Final posture   (x_f,y_f,theta_f)
+            init_final_velocity = 2
+            (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = tg.cubic_trajectory(q_i, q_f, init_final_velocity, self.t)   
+        elif(trajectory == "eight"):
+            #Eight trajectory
+            (self.x_d, self.y_d, self.dotx_d, self.doty_d) = tg.eight_trajectory(self.t)
+        elif (trajectory == "cyrcular"):    
+            #Cyrcular_trajectory
+            (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d, self.dotx_d, self.doty_d) = tg.cyrcular_trajectory(self.t)
 
-        # #Cubic_trajectory
-        # q_i = np.array([0.,0., 3.14/2]) #Initial posture (x_i,y_i,theta_i)
-        # q_f = np.array([3.,6., 0.])    #Final posture   (x_f,y_f,theta_f)
-        # init_final_velocity = 2
-        # (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = tg.cubic_trajectory(q_i, q_f, init_final_velocity, self.t)   
-
-        # #Cyrcular_trajectory
-        # (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = cyrcular_trajectory(self.t)
-
-        #Eight trajectory
-        (self.x_d, self.y_d, self.dotx_d, self.doty_d) = tg.eight_trajectory(self.t)
 
     def get_pose(self):
         #get robot position updated from callback
@@ -170,8 +171,9 @@ if __name__ == "__main__":
     try:
         tc=Trajectory_control()
         tc.t = np.linspace(0, 100, 1000)
-
-        tc.trajectory_generation()
+       
+        trajectory = "cyrcular"  #cubic, eight, cyrcular
+        tc.trajectory_generation(trajectory)
         #tc.unicicle_nonLinear_control()
         tc.unicycle_linearized_control()
 
