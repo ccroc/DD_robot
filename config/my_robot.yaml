@@ -28,11 +28,11 @@ DD_controller:
     x:
       has_velocity_limits    : true
       max_velocity           : 2.5   # m/s
-      has_acceleration_limits: true
-      max_acceleration       : 0.1  # m/s^2
+      has_acceleration_limits: false
+      max_acceleration       : 1.0  # m/s^2
   angular:
     z:
       has_velocity_limits    : true
-      max_velocity           : 2.5  # rad/s
-      has_acceleration_limits: true
-      max_acceleration       : 0.3  # rad/s^2
+      max_velocity           : 3.5  # rad/s
+      has_acceleration_limits: false
+      max_acceleration       : 6.0  # rad/s^2

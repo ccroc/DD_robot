@@ -1,36 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#from bqplot import pyplot as plt
 
-def plot_wmr(pose,scale=1.,ax=None, color=None):
-    #Triangle in (0,0)
-    X = np.array([[0.,-1.], [0.,1.], [2., 0.]])*scale
-        
-    x0,y0,theta = pose
-    R = np.array([[np.cos(theta), np.sin(theta)],[-np.sin(theta),np.cos(theta)]])
-    #rotate
-    X = np.matmul(X,R)
-    
-    #Translate
-    Xt = np.vstack((X.transpose(),[1,1,1]))
-    #2D Translation matrix
-    T = np.identity(3)
-    T[0:2,2] = [x0,y0]
-    
-    #Translate
-    Xtr = np.matmul(T,Xt)
-    robot = Xtr[0:-1,:].transpose()
-    
-    if ax:
-        if not color:
-            color = 'black'
-        
-        robot_p = plt.Polygon(robot, color=color)
-        ax.add_patch(robot_p)
-        
-    return robot
+'''
+Given the initial and final desired states (q_i, q_f) and
+the parameter k (inital/final desired speed) computes 
+thanks to flatness the desired trajectory and reference inputs.
 
-def compute_pose_inputs(q_i,q_f,k,  t=None):
+The output is a dictionary with the following keys:
+- x: x component of the desired trajectory
+- y: y component of the desired trajectory
+- theta: theta component of the desired trajectory
+- v: reference linear velocity input
+- w: reference angular velocity input
+'''
+def compute_cubic_trajectory(q_i,q_f,k,  t=None):
     #Compute derivative
     x_i = q_i[0]
     y_i = q_i[1]
@@ -39,8 +22,10 @@ def compute_pose_inputs(q_i,q_f,k,  t=None):
 
     if t is not None:
         s = t/t[-1]
+        tau = 1/t[-1]
     else:
         s = np.linspace(0,1,200)
+        tau = 1
         
     b_x = k*np.cos(q_i[2]) + 3*q_i[0]
     b_y = k*np.sin(q_i[2]) + 3*q_i[1]
@@ -71,7 +56,37 @@ def compute_pose_inputs(q_i,q_f,k,  t=None):
     out['x'] = x
     out['y'] = y
     out['theta'] = theta
-    out['v'] = v
-    out['w'] = w
+    out['v'] = v*tau
+    out['w'] = w*tau
    
     return out
+
+
+def plot_wmr(pose,scale=1.,ax=None, color=None):
+    #Triangle in (0,0)
+    X = np.array([[0.,-1.], [0.,1.], [2., 0.]])*scale
+        
+    x0,y0,theta = pose
+    R = np.array([[np.cos(theta), np.sin(theta)],[-np.sin(theta),np.cos(theta)]])
+    #rotate
+    X = np.matmul(X,R)
+    
+    #Translate
+    Xt = np.vstack((X.transpose(),[1,1,1]))
+    #2D Translation matrix
+    T = np.identity(3)
+    T[0:2,2] = [x0,y0]
+    
+    #Translate
+    Xtr = np.matmul(T,Xt)
+    robot = Xtr[0:-1,:].transpose()
+    
+    if ax:
+        if not color:
+            color = 'black'
+        
+        robot_p = plt.Polygon(robot, color=color)
+        ax.add_patch(robot_p)
+        
+    return robot
+

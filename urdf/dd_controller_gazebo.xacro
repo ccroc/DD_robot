@@ -22,7 +22,7 @@
         <commandTopic>cmd_vel</commandTopic>
         <odometryFrame>odom</odometryFrame> 
         <odometryTopic>odom</odometryTopic> 
-        <robotBaseFrame>base_frame</robotBaseFrame>
+        <robotBaseFrame>base_link</robotBaseFrame>
         </plugin>
     </gazebo> 
   </xacro:macro>

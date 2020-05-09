@@ -1,0 +1,12 @@
+name: my_robot
+
+base:
+  ubuntu: 18.04
+  ros: melodic-desktop-full
+
+build: catkin_make
+
+apt:
+  - ros-melodic-teleop-twist-keyboard
+  
+
