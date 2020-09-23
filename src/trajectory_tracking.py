@@ -65,7 +65,7 @@ class Trajectory_control():
             q_i = np.array([0.,0., 3.14/2]) #Initial posture (x_i,y_i,theta_i)
             q_f = np.array([3.,6., 0.])    #Final posture   (x_f,y_f,theta_f)
             init_final_velocity = 2
-            (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = tg.cubic_trajectory(q_i, q_f, init_final_velocity, self.t)   
+            (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = tg.cubic_trajectory(q_i, q_f, init_final_velocity, self.t)    
         elif(trajectory == "eight"):
             #Eight trajectory
             (self.x_d, self.y_d, self.dotx_d, self.doty_d) = tg.eight_trajectory(self.t)
@@ -130,6 +130,7 @@ class Trajectory_control():
         len_t = len(self.t)
         for i in np.arange(0, len(self.t)):
             (y1, y2, theta) = self.get_point_coordinate(b)
+            print('x_d: %d, y_d: %d, dotx_d: %d, doty_d: %d ', len(self.x_d), len(self.y_d), len(self.dotx_d), len(self.doty_d))
             (v, w) = io_linearization_control_law(y1, y2, theta, self.x_d[i], self.y_d[i], self.dotx_d[i], self.doty_d[i], b)
             print("linear:{} and angular:{}".format(v, w))           
             #move robot
@@ -172,12 +173,12 @@ if __name__ == "__main__":
         tc=Trajectory_control()
         tc.t = np.linspace(0, 100, 1000)
        
-        trajectory = "cyrcular"  #cubic, eight, cyrcular
+        trajectory = "cubic"  #cubic, eight, cyrcular
         tc.trajectory_generation(trajectory)
         #tc.unicicle_nonLinear_control()
-        tc.unicycle_linearized_control()
+        #tc.unicycle_linearized_control()
 
-        #tc.unicycle_cartesian_regulation()
+        tc.unicycle_cartesian_regulation()
 
     except rospy.ROSInterruptException:
         pass

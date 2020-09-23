@@ -15,5 +15,5 @@ If you want to command robot by keyboard arrows:
 ```
 For the trajectory tracking:
 ```
-    rosrun my_robot_urdf trajectory_control.py
+    rosrun my_robot_urdf trajectory_tracking.py
 ```
