@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from nav_msgs.msg import Odometry
@@ -174,7 +174,7 @@ if __name__ == "__main__":
         tc.trajectory_generation(trajectory)
 
         #tc.unicicle_nonLinear_control()
-        #tc.unicycle_linearized_control()
+        tc.unicycle_linearized_control()
         #tc.unicycle_cartesian_regulation()
 
     except rospy.ROSInterruptException:

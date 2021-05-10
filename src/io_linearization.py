@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import numpy as np
 
 def io_linearization_control_law(y1, y2, theta, y1d, y2d, doty1d, doty2d, b):
