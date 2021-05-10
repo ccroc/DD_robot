@@ -5,7 +5,7 @@
     <xacro:include filename="$(find my_robot_urdf)/urdf/cylinder_wheel.urdf.xacro" />
 
     <!--include cylinder wheel macro-->
-    <!-- <xacro:include filename="$(find my_robot_urdf)/urdf/dd_controller_gazebo.xacro" /> -->
+    <xacro:include filename="$(find my_robot_urdf)/urdf/dd_controller_gazebo.xacro" />
 
     <!-- include Hokuyo Laser scanner -->
     <xacro:include filename="$(find my_robot_urdf)/urdf/visual_sensor.xacro" />
@@ -52,7 +52,7 @@
         <inertial>
             <mass value="${base_mass}" />
             <!--The 3x3 rotational inertia matrix. -->
-            <cylinder_inertia  m="${base_mass}" r="${base_radius}" h="${base_height}" />
+            <xacro:cylinder_inertia  m="${base_mass}" r="${base_radius}" h="${base_height}" />
         </inertial>    
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
@@ -68,8 +68,8 @@
         </collision>     
     </link>
     <!--Cylinder Wheels -->
-    <cylinder_wheel fb="front" lr="right" parent="base_link" translateX="0" translateY="0.5" flipY="1"/>
-    <cylinder_wheel fb="front" lr="left" parent="base_link" translateX="0" translateY="-0.5" flipY="1"/>
+    <xacro:cylinder_wheel fb="front" lr="right" parent="base_link" translateX="0" translateY="0.5" flipY="1"/>
+    <xacro:cylinder_wheel fb="front" lr="left" parent="base_link" translateX="0" translateY="-0.5" flipY="1"/>
     <!--Caster Wheels -->
     <link name="caster_front_link">
         <visual>
@@ -125,7 +125,7 @@
         </plugin>
     </gazebo>
 
-
+    <!-- Gazebo plugin for publish real pose of robot -->
     <gazebo>
         <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
         <alwaysOn>true</alwaysOn>
@@ -139,9 +139,8 @@
         </plugin>
     </gazebo>
 
-
-    <!--
-    <dd_controller base_radius="${base_radius}" wheel_radius="${wheel_radius}"/>
-    -->
+    <!-- macro to spawn dd_controller into gazebo -->
+    <xacro:dd_controller base_radius="${base_radius}" wheel_radius="${wheel_radius}"/>
+   
 
 </robot>
