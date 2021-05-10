@@ -7,6 +7,6 @@ def cartesian_regulation_control_law(x, y, theta):
     
     #control inputs
     v = -k1 * (x * np.cos(theta) + y * np.sin(theta))
-    w = k2 * (np.arctan2(y, x) - np.pi + theta)
+    w = k2 * (np.arctan2(y, x) + np.pi - theta)
 
     return np.array([v, w])

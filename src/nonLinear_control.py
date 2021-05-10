@@ -3,8 +3,8 @@ import numpy as np
 '''
 This function implements a simple constant gain controller for $k_1(v_d,\omega_d)$
 ''' 
-zeta = 0.8
-a = 5
+zeta = 0.5
+a = 2
 
 def k1_circ(v_d, w_d):
     global zeta, a

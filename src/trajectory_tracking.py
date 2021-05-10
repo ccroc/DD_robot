@@ -60,13 +60,13 @@ class Trajectory_tracking():
         tg = Trajectory_generation()
         if(trajectory == "cubic"):
             #Cubic_trajectory
-            q_i = np.array([0.,0., 3.14/2]) #Initial trajectory posture (x_i,y_i,theta_i)
-            q_f = np.array([3.,6., 0.])    #Final trajectory posture   (x_f,y_f,theta_f)
-            init_final_velocity = 5
+            q_i = np.array([0., 0., 3.14/2]) #Initial trajectory posture (x_i,y_i,theta_i)
+            q_f = np.array([3., 6., 0.])    #Final trajectory posture   (x_f,y_f,theta_f)
+            init_final_velocity = 0.2
             (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = tg.cubic_trajectory(q_i, q_f, init_final_velocity, self.t)    
         elif(trajectory == "eight"):
-            #Eight trajectory
-            (self.x_d, self.y_d, self.dotx_d, self.doty_d) = tg.eight_trajectory(self.t)
+            #Eight_trajectory
+            (self.x_d, self.y_d, self.dotx_d, self.v_d, self.w_d, self.doty_d) = tg.eight_trajectory(self.t)
         elif (trajectory == "cyrcular"):    
             #Cyrcular_trajectory
             (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d, self.dotx_d, self.doty_d) = tg.cyrcular_trajectory(self.t)
@@ -86,7 +86,7 @@ class Trajectory_tracking():
         #compute error
         e1 = (self.x_d[T] - x) * np.cos(theta) + (self.y_d[T] - y) * np.sin(theta)
         e2 = -(self.x_d[T] - x) * np.sin(theta) + (self.y_d[T] - y) * np.cos(theta)
-        e3 = self.theta_d[T] - theta
+        e3 = self.theta_d[T] - theta if len(self.theta_d) else 0
         return np.array([e1, e2, e3])
 
     def unicicle_nonLinear_control(self):
@@ -97,14 +97,15 @@ class Trajectory_tracking():
         for i in np.arange(0, len(self.t)):           
             err = self.get_error(i)
             (v, w) = nonLinear_control_law(err, self.v_d[i], self.w_d[i])
-            theta_t = self.theta_d[i] - err[2]
+            print("linear:{} and angular:{}".format(v, w)) 
+            #theta_t = self.theta_d[i] - err[2] # from e3 equ
 
             # RF error
             print('Errors{}'.format(err))
             #rospy.loginfo(err)
 
             #move robot
-            self.send_velocities(v, w, theta_t)
+            self.send_velocities(v, w)
 
             rospy.sleep(max_t/len_t)
         
@@ -130,7 +131,7 @@ class Trajectory_tracking():
         len_t = len(self.t)
         for i in np.arange(0, len(self.t)):
             (y1, y2, theta) = self.get_point_coordinate(b)
-            #print('x_d: %d, y_d: %d, dotx_d: %d, doty_d: %d ', len(self.x_d), len(self.y_d), len(self.dotx_d), len(self.doty_d))
+            #y1 and y2 are inputs of controller
             (v, w) = io_linearization_control_law(y1, y2, theta, self.x_d[i], self.y_d[i], self.dotx_d[i], self.doty_d[i], b)
             print("linear:{} and angular:{}".format(v, w))           
             #move robot
@@ -141,7 +142,7 @@ class Trajectory_tracking():
 
             rospy.sleep(max_t/len_t)
         
-        #stop after time
+        #stop after times
         self.send_velocities(0,0,0)
 
     #I want to reach the origin 
@@ -157,7 +158,7 @@ class Trajectory_tracking():
             self.send_velocities(v, w, theta)
 
             # RF error
-            print('Errors{}'.format(self.get_error(i)))
+            #print('Errors{}'.format(self.get_error(i)))
 
             rospy.sleep(max_t/len_t)
         
@@ -166,7 +167,7 @@ class Trajectory_tracking():
 
 
     #publish v, w
-    def send_velocities(self, v, w, theta):
+    def send_velocities(self, v, w, theta=None):
         twist_msg = Twist() # Creating a new message to send to the robot
         # twist_msg.linear.x = v * np.cos(theta)
         # twist_msg.linear.y = v * np.sin(theta)
@@ -179,13 +180,13 @@ class Trajectory_tracking():
 if __name__ == "__main__":
     try:
         tt=Trajectory_tracking()
-        tt.t = np.linspace(0, 40, 1000)
+        tt.t = np.linspace(0, 80, 1000)
        
-        trajectory = "cubic"  #cubic, eight, cyrcular
+        trajectory = "eight"  #cubic, eight, cyrcular
         tt.trajectory_generation(trajectory)
 
-        #tt.unicicle_nonLinear_control()
-        tt.unicycle_linearized_control()
+        tt.unicicle_nonLinear_control()
+        #tt.unicycle_linearized_control()
         #tt.unicycle_cartesian_regulation()
 
     except rospy.ROSInterruptException:

@@ -81,10 +81,11 @@ class Trajectory_generation():
         y_c = 0
         R = 3 #radius
         w_d = 1./15  # Desired Angular speed
+        v_d = w_d * R
         # desired trajectory
         x_d = x_c + R*np.sin(2*w_d*t) 
         y_d = x_c + R*np.sin(w_d*t) 
         
         dotx_d = 2*R*w_d*np.cos(2*w_d*t)
         doty_d = R*w_d*np.cos(w_d*t)
-        return [x_d,y_d,dotx_d, doty_d]
+        return [x_d,y_d,dotx_d, doty_d, v_d*t, w_d*t]
