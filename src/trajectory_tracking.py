@@ -60,9 +60,9 @@ class Trajectory_tracking():
         tg = Trajectory_generation()
         if(trajectory == "cubic"):
             #Cubic_trajectory
-            q_i = np.array([0.,0., 3.14/2]) #Initial posture (x_i,y_i,theta_i)
-            q_f = np.array([3.,6., 0.])    #Final posture   (x_f,y_f,theta_f)
-            init_final_velocity = 2
+            q_i = np.array([0.,0., 3.14/2]) #Initial trajectory posture (x_i,y_i,theta_i)
+            q_f = np.array([3.,6., 0.])    #Final trajectory posture   (x_f,y_f,theta_f)
+            init_final_velocity = 5
             (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = tg.cubic_trajectory(q_i, q_f, init_final_velocity, self.t)    
         elif(trajectory == "eight"):
             #Eight trajectory
@@ -99,14 +99,13 @@ class Trajectory_tracking():
             (v, w) = nonLinear_control_law(err, self.v_d[i], self.w_d[i])
             theta_t = self.theta_d[i] - err[2]
 
-            rospy.loginfo(err)
+            # RF error
+            print('Errors{}'.format(err))
+            #rospy.loginfo(err)
 
             #move robot
             self.send_velocities(v, w, theta_t)
 
-            # RF error
-            print('Errors{}'.format(self.get_error(i)))
-            
             rospy.sleep(max_t/len_t)
         
         #stop after time
@@ -182,7 +181,7 @@ if __name__ == "__main__":
         tt=Trajectory_tracking()
         tt.t = np.linspace(0, 40, 1000)
        
-        trajectory = "cyrcular"  #cubic, eight, cyrcular
+        trajectory = "cubic"  #cubic, eight, cyrcular
         tt.trajectory_generation(trajectory)
 
         #tt.unicicle_nonLinear_control()
