@@ -42,7 +42,7 @@ def control(e, v_d, w_d):
     u_1 = -k1(v_d, w_d) * e[0]
     
     # Be sure that if e[2] = 0 sin(e[2])/e[2] is computes to 1.0
-    if e[2] == 0:
+    if e[2] == 0: #e_3
         u_2 = -k2*v_d*e[1] - k3(v_d,w_d)*e[2]
     else:
         u_2 = -k2*v_d*np.sin(e[2])/e[2]*e[1] - k3(v_d,w_d)*e[2]
@@ -51,19 +51,24 @@ def control(e, v_d, w_d):
     
 '''
 Error dynamics. This function is used odeint 
-to simulate the closed-loop system. 
+to simulate the closed-loop system.
+    @ e: array of errors [e1, e2, e3]
+    @ t: current time
+    @ v_d: desired velocity at time t
+    @ w_d: angular velocity at time t
+    @ time: array of times
 '''
 def unicycle_error_model(e, t, v_d, w_d, time):
-    T = np.searchsorted(time,t)
+    T = np.searchsorted(time,t) #index of t
     if (T>=len(time)):
         T = len(time)-1
-        
+    # compute control input    
     u_1, u_2 = control(e, v_d[T], w_d[T])
+    # differential equation of error
     edot_1 = u_1 + e[1]*(w_d[T] - u_2)
     edot_2 = v_d[T]*np.sin(e[2]) - e[0]*(w_d[T] - u_2)
     edot_3 = u_2
-    ret =  [edot_1,edot_2, edot_3]
-    return ret
+    return [edot_1,edot_2, edot_3]
 
 def R(theta):
     return np.array([[np.cos(theta), np.sin(theta), 0], 

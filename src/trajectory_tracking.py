@@ -26,8 +26,6 @@ class Trajectory_control():
     dotx_d=[]
     doty_d=[]
 
-    
-
     #methods
     def __init__(self):
         rospy.loginfo("Starting node Trajectory control")
@@ -89,8 +87,7 @@ class Trajectory_control():
         e1 = (self.x_d[T] - x) * np.cos(theta) + (self.y_d[T] - y) * np.sin(theta)
         e2 = -(self.x_d[T] - x) * np.sin(theta) + (self.y_d[T] - y) * np.cos(theta)
         e3 = self.theta_d[T] - theta
-        err = np.array([e1, e2, e3])
-        return err
+        return np.array([e1, e2, e3])
 
     def unicicle_nonLinear_control(self):
         rospy.sleep(0.1)    #need small time to setup q in callback
@@ -171,14 +168,14 @@ class Trajectory_control():
 if __name__ == "__main__":
     try:
         tc=Trajectory_control()
-        tc.t = np.linspace(0, 100, 1000)
+        tc.t = np.linspace(0, 40, 1000)
        
-        trajectory = "cubic"  #cubic, eight, cyrcular
+        trajectory = "cyrcular"  #cubic, eight, cyrcular
         tc.trajectory_generation(trajectory)
+
         #tc.unicicle_nonLinear_control()
         #tc.unicycle_linearized_control()
-
-        tc.unicycle_cartesian_regulation()
+        #tc.unicycle_cartesian_regulation()
 
     except rospy.ROSInterruptException:
         pass

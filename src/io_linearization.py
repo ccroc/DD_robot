@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
 
-
-
-
 def io_linearization_control_law(y1, y2, theta, y1d, y2d, doty1d, doty2d, b):
     # Define the two control gains. Notice we can define "how fast" we track on y_1 and y_2 _independently_
     k_1 = 0.5
