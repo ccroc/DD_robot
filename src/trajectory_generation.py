@@ -63,7 +63,7 @@ class Trajectory_generation():
     def cyrcular_trajectory(self, t):
         R = 3 # circle radius
         v_d_val = 0.5 # [m/s], const linear vel
-        w_d_val = v_d_val/R # const angualar vel
+        w_d_val = v_d_val/R # [rad/s], const angular vel
         # desired trajectory, starting from origin (t=0)
         x_d = R * np.cos(w_d_val * t) - R 
         y_d = R * np.sin(w_d_val * t)
