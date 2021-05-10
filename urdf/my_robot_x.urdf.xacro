@@ -115,7 +115,7 @@
 
     <!-- SENSORS -->
     <!-- hokuyo -->
-    <hokuyo base_radius="${base_radius}" base_height="${base_height}"/>
+    <xacro:hokuyo base_radius="${base_radius}" base_height="${base_height}"/>
 
 
     <!-- Gazebo plugin for ROS Control -->
