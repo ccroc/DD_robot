@@ -148,19 +148,17 @@ class Trajectory_tracking():
     #I want to reach the origin 
     def unicycle_cartesian_regulation(self):
         rospy.sleep(0.1)
-        max_t = self.t[len(self.t) - 1]
-        len_t = len(self.t)
-        for i in np.arange(0, len(self.t)):
+
+        (x, y, theta) = self.get_pose()
+        while (abs(x) > 0.02 or abs(y) > 0.02):
             (x, y, theta) = self.get_pose()
+            print('Current Pose x:{} y:{} theta:{}'.format(x,y,theta))
             (v,w) = cartesian_regulation_control_law(x, y, theta)
             print("linear:{} and angular:{}".format(v, w))           
             #move robot
             self.send_velocities(v, w, theta)
 
-            # RF error
-            #print('Errors{}'.format(self.get_error(i)))
-
-            rospy.sleep(max_t/len_t)
+            rospy.sleep(0.1)
         
         #stop after time
         self.send_velocities(0,0,0)
@@ -180,14 +178,15 @@ class Trajectory_tracking():
 if __name__ == "__main__":
     try:
         tt=Trajectory_tracking()
-        tt.t = np.linspace(0, 20, 1000)
+        tt.t = np.linspace(0, 10, 1000)
        
-        trajectory = "cubic"  #cubic, eight, cyrcular
-        tt.trajectory_generation(trajectory)
+        #trajectory = "cyrcular"  #cubic, eight, cyrcular
+        #tt.trajectory_generation(trajectory)
 
-        tt.unicicle_nonLinear_control()
+        #tt.unicicle_nonLinear_control()
         #tt.unicycle_linearized_control()
-        #tt.unicycle_cartesian_regulation()
+
+        tt.unicycle_cartesian_regulation() # no trajectory needed
 
     except rospy.ROSInterruptException:
         pass
