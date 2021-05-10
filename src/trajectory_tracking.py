@@ -103,6 +103,10 @@ class Trajectory_tracking():
 
             #move robot
             self.send_velocities(v, w, theta_t)
+
+            # RF error
+            print('Errors{}'.format(self.get_error(i)))
+            
             rospy.sleep(max_t/len_t)
         
         #stop after time
@@ -127,11 +131,15 @@ class Trajectory_tracking():
         len_t = len(self.t)
         for i in np.arange(0, len(self.t)):
             (y1, y2, theta) = self.get_point_coordinate(b)
-            print('x_d: %d, y_d: %d, dotx_d: %d, doty_d: %d ', len(self.x_d), len(self.y_d), len(self.dotx_d), len(self.doty_d))
+            #print('x_d: %d, y_d: %d, dotx_d: %d, doty_d: %d ', len(self.x_d), len(self.y_d), len(self.dotx_d), len(self.doty_d))
             (v, w) = io_linearization_control_law(y1, y2, theta, self.x_d[i], self.y_d[i], self.dotx_d[i], self.doty_d[i], b)
             print("linear:{} and angular:{}".format(v, w))           
             #move robot
             self.send_velocities(v, w, theta)
+
+            # RF error
+            print('Errors{}'.format(self.get_error(i)))
+
             rospy.sleep(max_t/len_t)
         
         #stop after time
@@ -148,6 +156,10 @@ class Trajectory_tracking():
             print("linear:{} and angular:{}".format(v, w))           
             #move robot
             self.send_velocities(v, w, theta)
+
+            # RF error
+            print('Errors{}'.format(self.get_error(i)))
+
             rospy.sleep(max_t/len_t)
         
         #stop after time
