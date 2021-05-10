@@ -61,8 +61,8 @@ class Trajectory_tracking():
         if(trajectory == "cubic"):
             #Cubic_trajectory
             q_i = np.array([0., 0., 3.14/2]) #Initial trajectory posture (x_i,y_i,theta_i)
-            q_f = np.array([3., 6., 0.])    #Final trajectory posture   (x_f,y_f,theta_f)
-            init_final_velocity = 0.2
+            q_f = np.array([3., 6., 3.14/2])    #Final trajectory posture   (x_f,y_f,theta_f)
+            init_final_velocity = 5
             (self.x_d, self.y_d, self.v_d, self.w_d, self.theta_d) = tg.cubic_trajectory(q_i, q_f, init_final_velocity, self.t)    
         elif(trajectory == "eight"):
             #Eight_trajectory
@@ -180,9 +180,9 @@ class Trajectory_tracking():
 if __name__ == "__main__":
     try:
         tt=Trajectory_tracking()
-        tt.t = np.linspace(0, 80, 1000)
+        tt.t = np.linspace(0, 20, 1000)
        
-        trajectory = "eight"  #cubic, eight, cyrcular
+        trajectory = "cubic"  #cubic, eight, cyrcular
         tt.trajectory_generation(trajectory)
 
         tt.unicicle_nonLinear_control()
