@@ -14,7 +14,7 @@ from posture_regulation import cartesian_regulation_control_law
 
 
 
-class Trajectory_control():
+class Trajectory_tracking():
     #attributes
     t = []
     x_d = []
@@ -29,7 +29,7 @@ class Trajectory_control():
     #methods
     def __init__(self):
         rospy.loginfo("Starting node Trajectory control")
-        rospy.init_node('trajectory_control', anonymous=True) #make node
+        rospy.init_node('trajectory_tracking', anonymous=True) #make node
         #elf.twist_pub = rospy.Publisher('/r2d2_diff_drive_controller/cmd_vel', Twist, queue_size=10)
         self.twist_pub = rospy.Publisher('/DD_controller/cmd_vel', Twist, queue_size=10) 
 
@@ -167,15 +167,15 @@ class Trajectory_control():
 
 if __name__ == "__main__":
     try:
-        tc=Trajectory_control()
-        tc.t = np.linspace(0, 40, 1000)
+        tt=Trajectory_tracking()
+        tt.t = np.linspace(0, 40, 1000)
        
         trajectory = "cyrcular"  #cubic, eight, cyrcular
-        tc.trajectory_generation(trajectory)
+        tt.trajectory_generation(trajectory)
 
-        #tc.unicicle_nonLinear_control()
-        tc.unicycle_linearized_control()
-        #tc.unicycle_cartesian_regulation()
+        #tt.unicicle_nonLinear_control()
+        tt.unicycle_linearized_control()
+        #tt.unicycle_cartesian_regulation()
 
     except rospy.ROSInterruptException:
         pass
